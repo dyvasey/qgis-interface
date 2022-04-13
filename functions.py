@@ -4,6 +4,7 @@ Scripts for interfacing with QGIS
 from osgeo import ogr
 from qgis.core import *
 from qgis.PyQt.QtGui import QColor
+from qgis.PyQt.QtCore import QVariant
 from matplotlib import cm
 
 def run_qgis():
@@ -48,7 +49,8 @@ def add_gpkg(path,project,crs=4326):
 def add_shp(path,project,crs=4326,name='layer'):
     layer = QgsVectorLayer(path,name,'ogr')
     layer = set_layer_crs(layer,number=crs)
-    if not vlayer.isValid():
+    if not layer.isValid():
+        print(layer.isValid())
         print(name+' failed.')
     else:
         project.addMapLayer(layer)
@@ -130,6 +132,24 @@ def qgis_colormap(cmap,number):
         colors.append(color)
     return(colors)
 
+def save_style(layer,path='style.qml'):
+    layer.saveNamedStyle(path)
+    return
+
+def add_field(layer,field,attributes,kind=QVariant.String):
+    layer_provider = layer.dataProvider()
+    layer_provider.addAttributes([QgsField(field,kind)])
+    layer.updateFields()
+    
+    nfields = len(layer.fields().names())
+    
+    features = layer.getFeatures()
+    layer.startEditing()
+    for x,f in enumerate(features):
+        fid = f.id()
+        layer.changeAttributeValue(fid,nfields-1,attributes[x])
+    
+    return
         
         
 
