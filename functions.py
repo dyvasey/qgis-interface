@@ -106,7 +106,7 @@ def change_shape_color(layer,shape,color,size):
     renderer.setSymbol(symbol)
     return
 
-def categorized_symbology(layer,field,values,shapes,colors,sizes):
+def categorized_symbology_point(layer,field,values,shapes,colors,sizes):
     
     categories = []
     if len(values) == len(shapes) == len(colors) == len(sizes):
@@ -122,6 +122,22 @@ def categorized_symbology(layer,field,values,shapes,colors,sizes):
         print('Lengths of values, shapes, and colors do not match')
     return
 
+def categorized_symbology_polygon(layer,field,values,fillcolors,edgecolors):
+    categories = []
+    if len(values) == len(fillcolors) == len(edgecolors):
+        for x in range(len(values)):
+            symbol = QgsFillSymbol.createSimple(
+                {'color':fillcolors[x],'outline_color':edgecolors[x]}
+                )
+            category = QgsRendererCategory(values[x], symbol, str(values[x]))
+            categories.append(category)
+        renderer = QgsCategorizedSymbolRenderer(field,categories)
+        layer.setRenderer(renderer)
+    else:
+        print('Lengths of values, shapes, and colors do not match')
+    return
+    
+
 def qgis_colormap(cmap,number):
     colormap = cm.get_cmap(cmap,number)
     colors = []
@@ -131,6 +147,10 @@ def qgis_colormap(cmap,number):
         color = QColor(rgba_255[0],rgba_255[1],rgba_255[2],rgba_255[3])
         colors.append(color)
     return(colors)
+
+def qgis_colors(colors):
+    qcolors = [QColor(color[0],color[1],color[2],color[3]) for color in colors]
+    return(qcolors)
 
 def save_style(layer,path='style.qml'):
     layer.saveNamedStyle(path)
@@ -148,6 +168,7 @@ def add_field(layer,field,attributes,kind=QVariant.String):
     for x,f in enumerate(features):
         fid = f.id()
         layer.changeAttributeValue(fid,nfields-1,attributes[x])
+    layer.commitChanges()
     
     return
         
