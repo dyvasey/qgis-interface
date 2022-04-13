@@ -1,0 +1,14 @@
+name: qgis-interface
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - conda-build
+  - spyder
+  - numpy
+  - matplotlib
+  - gdal
+  - geopandas
+  - pandas
+  - qgis
+prefix: /home/dyvasey/miniconda3/envs/qgis-interface
